@@ -7,7 +7,7 @@ import DataProcessing as dp
 # 预定义的字幕句子和文稿句子数组
 subtitle_sentences=[]
 manuscript_sentences=[]
-
+subtitle_time_info=[]
 
 # 打开待处理字幕文件并读取内容
 def open_file_1():
@@ -16,10 +16,12 @@ def open_file_1():
         with open(file_path, 'r', encoding='utf-8') as file:  # 指定utf-8编码读取文件
             content = file.read()
         text_box1.delete(1.0, tk.END)  # 清空文本框内容
-        global subtitle_sentences
+        global subtitle_sentences,subtitle_time_info
         # 提取字幕内容部分
-        subtitle_sentences = [subtitle[1] for subtitle in dp.extract_subtitles_lines(content)]  
-        #print(subtitle_sentences)
+        subtitle_sentences = [subtitle[1] for subtitle in dp.extract_subtitles(content)]  
+        # 提取字幕时间信息部分
+        subtitle_time_info = [subtitle[0] for subtitle in dp.extract_subtitles(content)] 
+        #print(subtitle_time_info)
         # 插入每个字幕句子到文本框
         text_box1.insert(tk.END, "\n".join(subtitle_sentences) + "\n")
     else:
@@ -42,7 +44,7 @@ def open_file_2():
             manuscript_sentences = dp.chat_with_model(dp.messages, dp.chat_completions_api_url) #分割后的文稿句子数组
         else:
              #使用第三方模型分句
-            manuscript_sentences = dp.third_party_split(content,48,1)
+            manuscript_sentences = dp.third_party_split(content,36,1)
            
         text_box2.delete(1.0, tk.END)  # 清空文本框内容
         text_box2.insert(tk.END, "\n".join(manuscript_sentences or []) + "\n")
@@ -141,23 +143,55 @@ def get_similarity():
 
     return similar_pairs
 
-txt="""今天是2025年1月16日星期四 ，欢迎来到硬核灌水，以下是本期的主要内容。
+##
+# 创建新列表替换原字幕内容[（其他信息，新字幕），...]
+##
 
-Fedora 42 正在考虑将其Live安装镜像切换到 EROFS
-来源： Michael Larabel
+def replace_subtitles():
+    # 用于存储替换后的字幕
+    replaced_subtitles = []
+    # 获取相似度计算结果
+    similar_pairs = get_similarity()
+    
+    # 遍历每个字幕句子
+    for i, time_info in enumerate(subtitle_time_info):
+        subtitle, most_similar_sentence, similarity = similar_pairs[i]
+        # 如果最相似的文稿句子不为空
+        if most_similar_sentence is not None:
+            # 将字幕句子替换为最相似的文稿句子
+            replaced_subtitles.append((time_info, most_similar_sentence))
+        else:
+            # 如果最相似的文稿句子为空，则保留原字幕句子
+            replaced_subtitles.append((time_info, subtitle))
+    
+    return replaced_subtitles
+##   
+# 保存替换后的字幕
+##
+def save_file():
+    file_path = filedialog.asksaveasfilename(defaultextension=".ass", filetypes=[("ASS files", "*.ass"), ("All files", "*.*")])
+    if file_path:
+        replaced_subtitles = replace_subtitles()
+        with open(file_path, 'w', encoding='utf-8') as file:
+            # 写入subtitle_other_info作为文件开头
+            file.write(dp.other_info + "\n")
+            print(dp.other_info)
+            # 写入替换后的字幕内容
+            for time_info, new_subtitle in replaced_subtitles:
+                new_subtitle = new_subtitle.replace('\n', '')  # 删除换行符
+                file.write(f"{time_info}{new_subtitle}\n")
+    
 
-Fedora 42 计划将其 live 安装镜像的文件系统从 SquashFS 切换为 EROFS，这项提案今天已提交。当前 Fedora Linux 的 live 安装介质使用 SquashFS 文件系统，但根据这项变更提案，Fedora 42 所有由 Kiwi 制作的 live 媒体，包括 Fedora KDE Desktop、Fedora Budgie、Fedora Xfce、Fedora COSMIC 等版本，将改为使用 EROFS，同时 Fedora CoreOS 的 live 安装镜像也会采用 EROFS。提案认为 EROFS 相较于 SquashFS 更积极地进行开发，且支持更多现代文件系统特性，能够在未来得到更好的应用。EROFS 自 2019 年由华为提出以来，已经增加了许多功能和优化，尤其在移动设备、嵌入式系统和容器中得到了广泛应用。需要注意的是，这项变更仅涉及 live 安装镜像，EROFS 会作为只读文件系统使用。此变更提案仍需通过 Fedora 工程与指导委员会（FESCo）的投票批准。
-小石： 为了现代化，我相信大部分人都会毫不犹豫的支持这一变化。
-"""
 def test():
     #test1=get_manuscripts_embeddings()
-    test1=get_similarity()
+    test1=save_file()
     #print(test1)
     with open("test_output.txt", "w", encoding="utf-8") as file:
         file.write(f"{test1}\n")
 
     print(f"test end")
     return
+
    
 
 

@@ -5,22 +5,30 @@ import numpy as np
 api_url="http://localhost:65530"
 chat_completions_api_url = api_url+"/api/oai/chat/completions"
 embeddings_api_url=api_url+"/api/oai/embeds"
-
+ 
 ###
 #               当前含错字幕数组
 ###
+other_info = ""  # 用于存储非Dialogue行的信息
 
 # 提取待处理的字幕句子 并返回字幕数组[(时间戳等信息，字幕句子),...]
-def extract_subtitles_lines(ass_content):
+def extract_subtitles(ass_content):
+    global other_info  # 声明使用全局变量
     subtitles = []
-    # 按行遍历传入的字幕内容
+
+    # 按行处理字幕文件内容
     for line in ass_content.splitlines():
-        if line.startswith("Dialogue:"):  # 找到以Dialogue开头的行
-            # 删除开头的前52个字符并将结果存入subtitles列表
-            other_info=line[:52].strip()
-            subtitle_text = line[52:].strip()  # 删除前52个字符并去掉两端空白
-            subtitles.append((other_info,subtitle_text))
+        if line.startswith("Dialogue:"):  # 找到字幕行
+            # 提取元信息（前52个字符）和字幕内容
+            info = line[:52].strip()
+            subtitle_text = line[52:].strip()
+            subtitles.append((info, subtitle_text))
+        else:
+            # 将非字幕行追加到global变量
+            other_info += line.strip() + "\n"
     
+    # 去除末尾多余空格
+    other_info = other_info.strip()
     return subtitles
 
 
@@ -107,7 +115,7 @@ def get_embeds(text): # 返回[(句子,嵌入向量),....]
 ## 
 #  从第三方模型获取分句结果和嵌入式向量 just=1,2,3 分别表示只返回分句结果、只返回嵌入向量、返回分句结果和嵌入向量
 ##
-def third_party_split(text, max_tokens=48, just=3):
+def third_party_split(text, max_tokens=36, just=3):
         # 最大 token 数 应当与Kdenlive字幕长度相同
         payload = {
             "input": text,
@@ -137,9 +145,11 @@ def third_party_split(text, max_tokens=48, just=3):
         except Exception as e:
             print(f"Error processing response: {e}")
             return []
-
+##
 # 计算余弦相似度
+##
 def cosine_similarity(vec1, vec2):
     vec1 = np.array(vec1).flatten()
     vec2 = np.array(vec2).flatten()
     return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+
