@@ -52,14 +52,13 @@ def chat_with_model(messages, api_url):
             "top_p": 0.5,
             "type": "Nucleus"
         },
-        "stop": ["\n\nUser:"],  # 停止词列表，防止模型无止境生成
-        "stream": False,  # 是否启用流模式，默认为False
-        "max_tokens": 1000  # 最大生成 token 数
+        "stop": ["\n\nUser:"], 
+        "stream": False,  
+        "max_tokens": 1000  
     }
 
     # 发送POST请求
     response = requests.post(api_url, headers=headers, json=data)
-
     if response.status_code == 200:
         try:
             result = response.json()
@@ -102,15 +101,14 @@ messages = [
 ###
 #       获取嵌入向量
 ### 
-def get_embeds(text): # 返回句子、嵌入向量
+def get_embeds(text): # 返回[(句子,嵌入向量),....]
     return third_party_split(text, 510,2)
 
 ## 
 #  从第三方模型获取分句结果和嵌入式向量 just=1,2,3 分别表示只返回分句结果、只返回嵌入向量、返回分句结果和嵌入向量
 ##
-def third_party_split(text, max_tokens=None, just=3):
-    if max_tokens is None:
-        max_tokens = 48  # 最大 token 数 应当与Kdenlive字幕长度相同
+def third_party_split(text, max_tokens=48, just=3):
+        # 最大 token 数 应当与Kdenlive字幕长度相同
         payload = {
             "input": text,
             "max_tokens": max_tokens,
@@ -142,4 +140,6 @@ def third_party_split(text, max_tokens=None, just=3):
 
 # 计算余弦相似度
 def cosine_similarity(vec1, vec2):
+    vec1 = np.array(vec1).flatten()
+    vec2 = np.array(vec2).flatten()
     return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))

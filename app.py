@@ -42,7 +42,7 @@ def open_file_2():
             manuscript_sentences = dp.chat_with_model(dp.messages, dp.chat_completions_api_url) #分割后的文稿句子数组
         else:
              #使用第三方模型分句
-            manuscript_sentences = dp.third_party_split(content,None,1)
+            manuscript_sentences = dp.third_party_split(content,48,1)
            
         text_box2.delete(1.0, tk.END)  # 清空文本框内容
         text_box2.insert(tk.END, "\n".join(manuscript_sentences or []) + "\n")
@@ -112,32 +112,34 @@ def get_manuscripts_embeddings():
         return manuscripts_embeddings
 
 def get_similarity():
-        # 获取字幕和文稿的嵌入向量
-        subtitles_embeddings = get_subtitles_embeddings()  # 返回 [(句子, 嵌入向量), ...]
-        manuscripts_embeddings = get_manuscripts_embeddings()  # 返回 [(句子, 嵌入向量), ...]
-        # 存储结果：字幕句子、最相似的文稿句子、相似度
-        similar_pairs = []
-        #初始化循环次数
-        round = 0 
-        index = 0
-        # 遍历每个字幕句子及其嵌入向量
-        for index in subtitles_embeddings:
-            max_similarity = -1  # 初始化最大相似度
-            most_similar_sentence = None  # 保存最相似的文稿句子
-            #计算n字幕句子与n文稿句子的相似度
-            index = round
-            now_similarity=dp.cosine_similarity(subtitles_embeddings[index][1], manuscripts_embeddings[index][1])
-            round += 1 #循环次数加1
-            # 如果相似度大于最大相似度，则更新最大相似度和最相似的文稿句子
-            if now_similarity > max_similarity:
-                subtitle_sentence = subtitles_embeddings[index][0]
-                max_similarity = now_similarity
-                most_similar_sentence = manuscripts_embeddings[index][0]
-                # 将结果添加到列表中
-                similar_pairs.append((subtitle_sentence,most_similar_sentence,max_similarity))
+    # 获取字幕和文稿的嵌入向量
+    subtitles_embeddings = get_subtitles_embeddings()  # 返回 [(字幕句子, 嵌入向量), ...]
+    manuscripts_embeddings = get_manuscripts_embeddings()  # 返回 [(文稿句子, 嵌入向量), ...]
 
-        
-        return similar_pairs
+    # 存储结果：字幕句子、最相似的文稿句子、相似度
+    similar_pairs = []
+
+    # 遍历每个字幕句子及其嵌入向量
+    for subtitle_sentence, subtitle_embedding in subtitles_embeddings:
+        max_similarity = -1  # 初始化最大相似度
+        most_similar_sentence = None  # 保存最相似的文稿句子
+
+        # 遍历每个文稿句子及其嵌入向量，计算相似度
+        for manuscript_sentence, manuscript_embedding in manuscripts_embeddings:
+            try:
+                # 计算余弦相似度
+                similarity = dp.cosine_similarity(subtitle_embedding, manuscript_embedding)
+                # 如果相似度大于最大相似度，则更新
+                if similarity > max_similarity:
+                    max_similarity = similarity
+                    most_similar_sentence = manuscript_sentence
+            except Exception as e:
+                print(f"Error calculating similarity: {e}")
+
+        # 将当前字幕句子及其最相似文稿句子和相似度添加到结果列表
+        similar_pairs.append((subtitle_sentence, most_similar_sentence, max_similarity))
+
+    return similar_pairs
 
 txt="""今天是2025年1月16日星期四 ，欢迎来到硬核灌水，以下是本期的主要内容。
 
@@ -149,8 +151,8 @@ Fedora 42 计划将其 live 安装镜像的文件系统从 SquashFS 切换为 ER
 """
 def test():
     #test1=get_manuscripts_embeddings()
-    test1=dp.third_party_split(txt)
-    print(test1)
+    test1=get_similarity()
+    #print(test1)
     with open("test_output.txt", "w", encoding="utf-8") as file:
         file.write(f"{test1}\n")
 
