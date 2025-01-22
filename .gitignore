@@ -1,0 +1,10 @@
+1.txt
+注解.ini
+test_output.txt
+.vscode/settings.json
+__pycache__/app.cpython-313.pyc
+__pycache__/DataProcessing.cpython-310.pyc
+__pycache__/DataProcessing.cpython-312.pyc
+__pycache__/DataProcessing.cpython-313.pyc
+test_app.py
+test.py
