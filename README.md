@@ -2,6 +2,7 @@
 ## 关于本项目
 依赖AI00 Server （RWKV）驱动，暂不支持调用其他模型。
 ~~当前仅适用于Linux 用户。~~
+![image](https://github.com/user-attachments/assets/ddc4442f-8d2d-4796-acb8-7e0c19205ac0)
 
 ## 使用方式
 1. 下载仓库文件
