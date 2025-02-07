@@ -153,3 +153,22 @@ def cosine_similarity(vec1, vec2):
     vec2 = np.array(vec2).flatten()
     return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
 
+##
+# 合并重复字幕
+##
+def merge_repeated_subtitles(subtitles):
+
+    merged_subtitles = []
+    # 遍历字幕数组
+    for i, (info, subtitle_text) in enumerate(subtitles):
+        if i == 0:  # 第一个字幕
+            current_subtitle = subtitle_text
+            continue
+        if subtitle_text == current_subtitle:  # 如果当前字幕与前一个字幕相同
+            continue
+        else:  # 如果不同
+            merged_subtitles.append((info, current_subtitle))
+            current_subtitle = subtitle_text
+    # 添加最后一个字幕
+    merged_subtitles.append((info, current_subtitle))
+    return merged_subtitles

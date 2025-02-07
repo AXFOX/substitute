@@ -1,29 +1,26 @@
-今天是2025年1月16日星期四 ，欢迎来到硬核灌水，以下是本期的主要内容。
+今天是2025年2月7日 星期五，硬核观察复刻第1期。
+以下是本期的主要内容。
 
-Fedora 42 正在考虑将其Live安装镜像切换到 EROFS
-来源： Michael Larabel
+1. Ubuntu 推出全新 crypto-config 工具 采用渐进式推出方案
+Canonical 团队正在开发一项名为 crypto-config 的新工具，用于系统范围内的密码学配置。这一工具将为 Ubuntu 系统提供更强大的安全性与灵活性。值得注意的是，crypto-config 将采用渐进式推出方案，以确保在不同场景下的稳定性和兼容性。Canonical 工程师表示，该工具的目标是简化加密协议的管理和版本控制，同时提升系统整体的安全防护能力。
 
-Fedora 42 计划将其 live 安装镜像的文件系统从 SquashFS 切换为 EROFS，这项提案今天已提交。当前 Fedora Linux 的 live 安装介质使用 SquashFS 文件系统，但根据这项变更提案，Fedora 42 所有由 Kiwi 制作的 live 媒体，包括 Fedora KDE Desktop、Fedora Budgie、Fedora Xfce、Fedora COSMIC 等版本，将改为使用 EROFS，同时 Fedora CoreOS 的 live 安装镜像也会采用 EROFS。提案认为 EROFS 相较于 SquashFS 更积极地进行开发，且支持更多现代文件系统特性，能够在未来得到更好的应用。EROFS 自 2019 年由华为提出以来，已经增加了许多功能和优化，尤其在移动设备、嵌入式系统和容器中得到了广泛应用。需要注意的是，这项变更仅涉及 live 安装镜像，EROFS 会作为只读文件系统使用。此变更提案仍需通过 Fedora 工程与指导委员会（FESCo）的投票批准。
-小石： 为了现代化，我相信大部分人都会毫不犹豫的支持这一变化。
+crypto-config.png
 
-英特尔 THC 驱动程序即将提交 Linux 6.14
-Intel THC 驱动程序将为现代 Intel 笔记本的触摸输入设备提供支持，帮助 Linux 操作系统更好地兼容这些设备。该驱动程序将包含在即将发布的 Linux 6.14 内核版本中，支持最新的和即将发布的 Intel SoC。
+2. VirtIO Media 驱动上游进展：虚拟化媒体设备新突破
+针对虚拟机中的多媒体设备支持问题，Linux 社区正在推进 VirtIO Media Driver 的上游化进程。这项技术将允许宿主机的 V4L2 媒体设备（如摄像头、音频设备）通过 VirtIO 传递到 Guest 系统中，为虚拟化场景下的多媒体应用提供了更多可能性。目前，Android 和 Chrome OS 已经集成这一驱动，而其合并到主线内核的工作也在进行中。
 
-小石：该驱动的工作从去年就开始了，看来我们有望在新的英特尔笔记本上完美运行Linux发行版。
+2025-02-07T11:46:24.png
+3. AMD EPYC 5th Gen 性能测试：SMT 功能至关重要
+在最新的测试中，AMD EPYC 9005 系列处理器 的 SMT（Simultaneous Multi-Threading） 功能展现了显著的性能优势。结果显示，在多线程任务中，开启 SMT 可以带来高达 40% 的性能提升。对于服务器场景而言，这无疑是一个巨大的利好消息。此外，5th Gen EPYC 处理器在 AVX-512 性能方面也表现优异，进一步巩固了 AMD 在高性能计算领域的地位。
 
-NVMe PCI 端点功能目标驱动程序将在 Linux 6.14 中推出
-来源：Michael Larabel
+2025-02-07T11:47:18.png
+4. AMD 推动 Ryzen AI NPU 编程模型：IREE/MLIR 赋能新未来
+AMD 最近在 FOSDEM 开发者大会上详细介绍了 Ryzen AI NPU 的编程支持。通过 IREE 和 MLIR 技术，开发者可以更高效地利用 Ryzen AI 神经处理单元（NPU）进行人工智能任务加速。尽管目前 XDNA 驱动已合并到 Linux 6.14 内核中，但用户空间软件的开发仍在进行中。这一进展为未来的 AI 加速应用奠定了坚实的基础。
 
-由西部数据编写的 NVMe PCI 端点功能目标代码是即将在 Linux 6.14 内核中首发的一款有趣的新驱动程序。
-在 Linux 6.14 合并窗口打开之前，Linux 块子系统的 “for-next ”分支就已经在排队了，它是使用 PCI 端点框架的新 NVMe PCI 目标驱动程序。有了能在端点模式下运行的 PCI 控制器，就能创建 PCIe NVMe 控制器。
-文档补丁详细介绍了该 NVMe 目标驱动程序的所有有趣技术细节。该驱动程序主要用于测试目的，例如在拥有 PCIe 端点控制器的小型单板计算机上创建一个 NVMe 目标来循环文件或块设备。也可以使用 TCP 目标来连接远程 NVMe 设备。
-实践中 Rock5B 板（搭载 Rockchip RK3588 SoC 和 PCI Gen3x4 endpoint 控制器）进行测试时，使用 fio 工具进行随机 4K 读取时，最大性能为 131 KIOPS，并且最大吞吐量可达到 2.8 GB/s。
-除非出现任何最后一刻的问题，该驱动程序应该在即将到来的 Linux 6.14 内核周期中首次亮相。
+2025-02-07T11:47:42.png
+5. Intel OpenVINO 2025.0 发布：支持 Deepseek 模型
+Intel 推出了 OpenVINO 2025.0，这是其人工智能推理工具包的最新版本。此次更新加入了对 Deepseek 等大语言模型的支持，并优化了现有模型的性能表现。对于开发者而言，这一版本将提供更强大的 AI 开发能力，特别适合需要高性能推理的应用场景。
 
-小石：虽然没什么关系，但是这个驱动程序还是让我想起来某些伪装成M.2 NVMe的DMA硬件....也许是我最近FPS游戏玩多了吧。
-
-开源虚拟化 API libvirt 11.0 发布
-来源：Michael Larabel
-Libvirt 11.0 发布了多个重要新特性和改进，增强了其作为开源虚拟化 API 的功能。主要新增了对 vLAN 的支持，使得用户可以在标准 Linux 主机桥接器上进行 vLAN 标记和中继配置。此外，引入了对直接和扩展 TLB Flush 特性的支持，改善了内存管理，并扩展到 Microsoft Hyper-V 平台。该版本还允许用户在虚拟机的 domain XML 中自定义设备别名，增加了 VirtIOFS 的只读模式，优化了 QEMU 迁移功能，并修复了一些已知问题，进一步提高了性能和稳定性。
-
-小石：这些新功能对喜欢折腾All in ~BOOM~ One的高级玩家有重要意义，有了Vlan支持也许某些东西没必要跑在Docker里了，LXC不失为另一轻量化的选择。
+2025-02-07T11:48:03.png
+6. LibreOffice 25.2 发布：功能与性能双提升
+办公套件 LibreOffice 推出了最新版本 25.2，带来了一系列改进。新版本优化了文档处理速度，修复了多个兼容性问题，并增加了对更多格式的支持。这对于需要稳定性和高效性的办公用户来说无疑是个好消息。

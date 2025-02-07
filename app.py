@@ -86,6 +86,10 @@ chk_var = tk.BooleanVar()
 chk_rwkv = tk.Checkbutton(frame, text="RWKV分句", variable=chk_var)
 chk_rwkv.pack(pady=5)
 
+# 创建 "合并重复字幕" 候选框，点击时勾选
+chk_merge_duplicates = tk.BooleanVar()
+chk_merge = tk.Checkbutton(frame, text="合并重复字幕", variable=chk_merge_duplicates)
+chk_merge.pack(pady=5)
 
 # 创建文本框，用于显示待处理字幕数组
 text_box1 = tk.Text(app, wrap='word', width=50, height=15)
@@ -163,7 +167,9 @@ def replace_subtitles():
         else:
             # 如果最相似的文稿句子为空，则保留原字幕句子
             replaced_subtitles.append((time_info, subtitle))
-    
+    # 如果勾选了“合并重复字幕”
+    if chk_merge_duplicates.get():
+        replaced_subtitles = dp.merge_repeated_subtitles(replaced_subtitles)
     return replaced_subtitles
 ##   
 # 保存替换后的字幕
